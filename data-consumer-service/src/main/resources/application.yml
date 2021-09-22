@@ -1,0 +1,52 @@
+spring:
+  profiles:
+    active: prod
+server:
+  port: 8085
+
+---
+
+spring:
+  profiles: nonprod
+  kafka:
+    consumer:
+      bootstrap-servers: localhost:9095,localhost:9093,localhost:9094
+      key-deserializer: org.apache.kafka.common.serialization.IntegerDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      group-id: library-events-listener-group
+  datasource:
+    url: jdbc:oracle:thin:@34.87.9.238:1521:xe
+    driver-class-name: oracle.jdbc.driver.OracleDriver
+    username: system
+    password: system123
+  jpa:
+    database: oracle
+    database-platform: org.hibernate.dialect.OracleDriver
+    generate-ddl: true
+
+---
+spring:
+  profiles: prod
+  kafka:
+    consumer:
+      bootstrap-servers: localhost:9095,localhost:9093,localhost:9094
+      key-deserializer: org.apache.kafka.common.serialization.IntegerDeserializer
+      value-deserializer: com.headstrait.dataconsumer.deserializer.CustomDeserializer
+      group-id: library-events-listener-group
+      properties:
+        spring:
+          json:
+            trusted:
+              packages: "com.headstrait.dataconsumer.deserializer.CustomDeserializer"
+
+  datasource:
+    url: jdbc:oracle:thin:@34.87.9.238:1521:xe
+    driver-class-name: oracle.jdbc.OracleDriver
+    username: system
+    password: system123
+  jpa:
+    database: oracle
+    database-platform: org.hibernate.dialect.Oracle8iDialect
+    generate-ddl: true
+
+

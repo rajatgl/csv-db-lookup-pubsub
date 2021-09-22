@@ -1,0 +1,48 @@
+spring:
+  profiles:
+    active: prod
+server:
+  port: 8084
+---
+spring:
+  kafka:
+    template:
+      default-topic: library-events
+    producer:
+      bootstrap-servers: localhost:9095,localhost:9093,localhost:9094
+      key-serializer: org.apache.kafka.common.serialization.IntegerSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      properties:
+        acks: all
+        retries: 10
+        retry.backoff.ms: 1000
+    admin:
+      properties:
+        bootstrap.servers: localhost:9095,localhost:9093,localhost:9094
+  config:
+    activate:
+      on-profile: local
+
+---
+spring:
+  kafka:
+    template:
+      default-topic: library-events
+    producer:
+      bootstrap-servers: localhost:9095,localhost:9093,localhost:9094
+      key-serializer: org.apache.kafka.common.serialization.IntegerSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        acks: all
+        retries: 10
+        retry.backoff.ms: 1000
+        sasl:
+          jaas:
+            config: org.apache.kafka.common.security.plain.PlainLoginModule
+    admin:
+      properties:
+        bootstrap.servers: localhost:9095,localhost:9093,localhost:9094
+  config:
+    activate:
+      on-profile: prod
+
