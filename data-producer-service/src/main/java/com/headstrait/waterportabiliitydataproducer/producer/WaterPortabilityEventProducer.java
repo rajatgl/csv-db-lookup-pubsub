@@ -92,7 +92,7 @@ public class WaterPortabilityEventProducer {
 
     //ToDo: send event in json format.
     public ListenableFuture<SendResult<Integer,WaterPortability>> sendJson(WaterPortability waterPortability,
-                                                             int id) throws JsonProcessingException {
+                                                             int id) {
 
         Integer key = id;
         WaterPortability value = waterPortability;

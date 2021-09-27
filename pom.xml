@@ -113,6 +113,13 @@
 				<version>${kafka.version}</version>
 			</dependency>
 
+			<!-- https://mvnrepository.com/artifact/org.apache.kafka/kafka-streams -->
+			<dependency>
+				<groupId>org.apache.kafka</groupId>
+				<artifactId>kafka-streams</artifactId>
+				<version>${kafka.version}</version>
+			</dependency>
+
 			<dependency>
 				<groupId>org.springframework.kafka</groupId>
 				<artifactId>spring-kafka-test</artifactId>
@@ -178,6 +185,19 @@
 				<artifactId>gson</artifactId>
 				<version>2.8.5</version>
 			</dependency>
+
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-stream</artifactId>
+				<version>2.0.0.RELEASE</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-stream-binder-kafka-streams</artifactId>
+				<version>2.0.0.RELEASE</version>
+			</dependency>
+
 
 		</dependencies>
 	</dependencyManagement>

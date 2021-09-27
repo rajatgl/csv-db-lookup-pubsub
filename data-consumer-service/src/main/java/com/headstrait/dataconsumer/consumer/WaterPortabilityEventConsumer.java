@@ -15,10 +15,13 @@ public class WaterPortabilityEventConsumer {
     @Autowired
     WaterPotabilityEventService waterPotabilityEventService;
 
+    public ConsumerRecord<Integer, WaterPortabilityModel> consumerRecord;
+
     @KafkaListener(topics = {"water-portability-events"})
     public void onMessage1(ConsumerRecord<Integer, WaterPortabilityModel> consumerRecord){
 
         waterPotabilityEventService.processJsonConsumerEvent(consumerRecord);
+        this.consumerRecord = consumerRecord;
         log.info("ConsumerRecord-C1 : {} ", consumerRecord );
 
     }
