@@ -29,10 +29,10 @@ spring:
   profiles: prod
   kafka:
     consumer:
-      bootstrap-servers: localhost:9095,localhost:9093,localhost:9094
+      bootstrap-servers: localhost:19092,localhost:29092,localhost:39092
       key-deserializer: org.apache.kafka.common.serialization.IntegerDeserializer
       value-deserializer: com.headstrait.dataconsumer.deserializer.CustomDeserializer
-      group-id: library-events-listener-group
+      group-id: water-portability-event-listener-group
       properties:
         spring:
           json:
@@ -40,13 +40,12 @@ spring:
               packages: "com.headstrait.dataconsumer.deserializer.CustomDeserializer"
 
   datasource:
-    url: jdbc:oracle:thin:@34.87.9.238:1521:xe
-    driver-class-name: oracle.jdbc.OracleDriver
-    username: system
-    password: system123
+    url: ${PG_URL}
+    driver-class-name: org.postgresql.Driver
+    username: ${PG_USERNAME}
+    password: ${PG_PASSWORD}
   jpa:
-    database: oracle
-    database-platform: org.hibernate.dialect.Oracle8iDialect
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     generate-ddl: true
 
 

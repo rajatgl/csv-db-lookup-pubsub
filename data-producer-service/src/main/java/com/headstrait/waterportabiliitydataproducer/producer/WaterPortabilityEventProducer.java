@@ -8,6 +8,8 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.header.Header;
 import org.apache.kafka.common.header.internals.RecordHeader;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Component;
@@ -31,10 +33,7 @@ import static com.headstrait.waterportabiliitydataproducer.util.CommonUtil.delay
 public class WaterPortabilityEventProducer {
 
     @Autowired
-    KafkaTemplate<Integer, String> kafkaTemplate;
-
-    @Autowired
-    KafkaTemplate<Integer, WaterPortability> kafkaTemplate2;
+    KafkaTemplate<Integer, WaterPortability> kafkaTemplate;
 
     private final String topic = "water-portability-events";
 
@@ -65,30 +64,6 @@ public class WaterPortabilityEventProducer {
         return listOfEventsToBeSentToTopic;
     }
 
-    public ListenableFuture<SendResult<Integer,String>> send(WaterPortability waterPortability,
-                                                                                   int id) throws JsonProcessingException {
-
-        Integer key = id;
-        String value = objectMapper.writeValueAsString(waterPortability);
-
-        ProducerRecord<Integer,String> producerRecord = buildProducerRecord(key, value);
-
-        ListenableFuture<SendResult<Integer, String>> listenableFuture =  kafkaTemplate.send(producerRecord);
-
-        listenableFuture.addCallback(new ListenableFutureCallback<SendResult<Integer, String>>() {
-            @Override
-            public void onFailure(Throwable ex) {
-                handleFailure(key, value, ex);
-            }
-
-            @Override
-            public void onSuccess(SendResult<Integer, String> result) {
-                handleSuccess(key, value, result);
-            }
-        });
-
-        return listenableFuture;
-    }
 
     //ToDo: send event in json format.
     public ListenableFuture<SendResult<Integer,WaterPortability>> sendJson(WaterPortability waterPortability,
@@ -99,7 +74,8 @@ public class WaterPortabilityEventProducer {
 
         ProducerRecord<Integer,WaterPortability> producerRecordJson = buildProducerRecordJson(key, value);
 
-        ListenableFuture<SendResult<Integer, WaterPortability>> listenableFutureV2 =  kafkaTemplate2.send(producerRecordJson);
+        ListenableFuture<SendResult<Integer, WaterPortability>> listenableFutureV2 =
+                kafkaTemplate.send(producerRecordJson);
 
         listenableFutureV2.addCallback(new ListenableFutureCallback<SendResult<Integer, WaterPortability>>() {
             @Override
@@ -116,6 +92,7 @@ public class WaterPortabilityEventProducer {
         return listenableFutureV2;
     }
 
+    @EventListener(ApplicationReadyEvent.class)
     public void producer() throws JsonProcessingException {
         List<WaterPortability> data = fetchData();
         for(int i=0; i<data.size();i++){
@@ -124,31 +101,12 @@ public class WaterPortabilityEventProducer {
         }
     }
 
-    private ProducerRecord<Integer, String> buildProducerRecord(Integer key, String value) {
-
-
-        List<Header> recordHeaders = Collections.singletonList(new RecordHeader("event-source", "scanner".getBytes()));
-
-        return new ProducerRecord<>(topic, null, key, value, recordHeaders);
-    }
 
     //producer record builder for json send event
     private ProducerRecord<Integer, WaterPortability> buildProducerRecordJson(Integer key, WaterPortability value) {
-
-
-        List<Header> recordHeaders = Collections.singletonList(new RecordHeader("event-source", "scanner".getBytes()));
-
-        return new ProducerRecord<>(topic, null, key, value, recordHeaders);
+        return new ProducerRecord<>(topic, key, value);
     }
 
-    private void handleFailure(Integer key, String value, Throwable ex) {
-        log.error("Error Sending the Message and the exception is {}", ex.getMessage());
-        try {
-            throw ex;
-        } catch (Throwable throwable) {
-            log.error("Error in OnFailure: {}", throwable.getMessage());
-        }
-    }
 
     //fail handler for json send event
     private void handleFailure(Integer key, WaterPortability value, Throwable ex) {
@@ -158,11 +116,6 @@ public class WaterPortabilityEventProducer {
         } catch (Throwable throwable) {
             log.error("Error in OnFailure: {}", throwable.getMessage());
         }
-    }
-
-    private void handleSuccess(Integer key, String value, SendResult<Integer, String> result) {
-        log.info("Message Sent SuccessFully for the key : {} and the value is {} , partition is {}",
-                key, value, result.getRecordMetadata().partition());
     }
 
     //success handler for json send event

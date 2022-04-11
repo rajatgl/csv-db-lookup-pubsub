@@ -1,19 +1,18 @@
 spring:
   profiles:
-    active: nonprod
+    active: local
 server:
   port: 8090
 ---
 spring:
   datasource:
-    url: jdbc:oracle:thin:@34.87.9.238:1521:xe
-    driver-class-name: oracle.jdbc.driver.OracleDriver
-    username: system
-    password: system123
+    url: ${PG_URL}
+    driver-class-name: org.postgresql.Driver
+    username: ${PG_USERNAME}
+    password: ${PG_PASSWORD}
   jpa:
-    database: oracle
-    database-platform: org.hibernate.dialect.Oracle8iDialect
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     generate-ddl: true
   config:
     activate:
-      on-profile: nonprod
+      on-profile: local
