@@ -1,9 +1,8 @@
-package com.headstrait.datasource.fluxfetch;
+package com.headstrait.datasource.service;
 
-import lombok.extern.slf4j.Slf4j;
 import com.headstrait.datasource.constants.Constants;
-import org.springframework.stereotype.Component;
-import reactor.core.publisher.Flux;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
@@ -13,30 +12,26 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.headstrait.datasource.utils.CommonUtils.startTimer;
-import static com.headstrait.datasource.utils.CommonUtils.timeTaken;
-
 @Slf4j
-@Component
+@Service
 public class CsvReader {
 
-    static final Path ipPath = Paths.get(Constants.filePath);
+    static final Path filePath = Paths.get(Constants.filePath);
 
-    public static Mono<String> stringMono;
+    private Mono<String> stringMono;
 
-    static {
+    public String getStringFromMono() {
         try {
-            System.out.println(ipPath.toAbsolutePath());
-            stringMono = Mono.just(csvToJson(Files.lines(ipPath).collect(Collectors.toList())));
+            System.out.println(filePath.toAbsolutePath());
+            stringMono = Mono.just(csvToJson(Files.lines(filePath)
+                    .collect(Collectors.toList())));
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return stringMono.block();
     }
 
-    public static String csvToJson(List<String> csv){
-
-        startTimer();
-
+    private String csvToJson(List<String> csv){
         //remove empty lines
         csv.removeIf(e -> e.trim().isEmpty());
 
@@ -78,7 +73,6 @@ public class CsvReader {
 
         json.append("\n]");
 
-        timeTaken();
         return json.toString();
     }
 

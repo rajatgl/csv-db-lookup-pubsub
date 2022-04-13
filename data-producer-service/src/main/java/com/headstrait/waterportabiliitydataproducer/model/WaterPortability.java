@@ -70,6 +70,7 @@ public class WaterPortability implements Serializable {
         }catch (Exception e){
             this.potability = null;
         }
-
     }
+
+
 }

@@ -27,4 +27,18 @@ public class WaterPortabilityModel implements Serializable {
     private Double trihalomethanes;
     private Double turbidity;
     private Double potability;
+
+    public WaterPortabilityModel(Double ph, Double hardness, Double solids,
+                                 Double chloramines, Double conductivity, Double organic_carbon,
+                                 Double trihalomethanes, Double turbidity, Double potability) {
+        this.ph = ph;
+        this.hardness = hardness;
+        this.solids = solids;
+        this.chloramines = chloramines;
+        this.conductivity = conductivity;
+        this.organic_carbon = organic_carbon;
+        this.trihalomethanes = trihalomethanes;
+        this.turbidity = turbidity;
+        this.potability = potability;
+    }
 }
