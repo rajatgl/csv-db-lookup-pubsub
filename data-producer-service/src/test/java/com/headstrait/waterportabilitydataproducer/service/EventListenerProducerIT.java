@@ -52,8 +52,8 @@ import static org.springframework.kafka.test.assertj.KafkaConditions.key;
 @SpringBootTest(classes = DataProducerApplication.class)
 public class EventListenerProducerIT {
 
-    @MockBean
-    ObjectMapper objectMapper;
+//    @MockBean
+//    ObjectMapper objectMapper;
 
 //    @InjectMocks
 //    DataFetcher dataFetcher;
@@ -158,7 +158,7 @@ public class EventListenerProducerIT {
         ConsumerRecord<Integer, String> received =
                 consumerRecords.poll(10, TimeUnit.SECONDS);
 
-        ObjectMapper mapper = new ObjectMapper();
+//        ObjectMapper mapper = new ObjectMapper();
 //        String json = mapper.writeValueAsString(waterPortabilityEvents.get(0));
 
 //        assertThat(received, hasValue(json));
