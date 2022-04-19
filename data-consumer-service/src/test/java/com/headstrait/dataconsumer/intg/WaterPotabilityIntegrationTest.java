@@ -6,7 +6,6 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.IntegerSerializer;
-import org.apache.kafka.common.serialization.StringSerializer;
 import org.awaitility.Durations;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -42,7 +41,7 @@ public class WaterPotabilityIntegrationTest {
     @Autowired
     private WaterPortabilityRepository waterPortabilityRepository;
 
-    public WaterPortabilityModel mockExampleDTO() {
+    public WaterPortabilityModel mockWaterPotabilityData() {
         return new WaterPortabilityModel(0.0,0.0,0.0,
                 0.0,0.0,0.0,0.0,0.0,0.0);
     }
@@ -54,7 +53,7 @@ public class WaterPotabilityIntegrationTest {
     public void itShould_ConsumeCorrectWaterPotabilityEvent_from_TOPIC_EXAMPLE_and_should_saveTheEntity()
             throws ExecutionException, InterruptedException {
         // GIVEN
-        WaterPortabilityModel waterPortabilityModel = mockExampleDTO();
+        WaterPortabilityModel waterPortabilityModel = mockWaterPotabilityData();
         // SIMULATE PRODUCER
         Map<String, Object> producerProps = KafkaTestUtils
                 .producerProps(embeddedKafkaBroker.getBrokersAsString());
@@ -76,10 +75,9 @@ public class WaterPotabilityIntegrationTest {
         // THEN
         await().atMost(Durations.TEN_SECONDS).untilAsserted(() -> {
             var waterPotabilityEntityList = waterPortabilityRepository.findAll();
-            assertEquals(0, waterPotabilityEntityList.size());
-//            WaterPortabilityModel firstEntity = waterPotabilityEntityList.get(0);
-//            assertEquals(waterPortabilityModel.getPh(), firstEntity.getPh());
-//            assertEquals(exampleDTO.getName(), firstEntity.getName());
+            assertEquals(1, waterPotabilityEntityList.size());
+            WaterPortabilityModel firstEntity = waterPotabilityEntityList.get(0);
+            assertEquals(waterPortabilityModel.getPh(), firstEntity.getPh());
         });
         //teardown
         producerTest.close();
