@@ -10,7 +10,6 @@ import org.springframework.context.event.EventListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
-import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureCallback;
 
 import java.util.List;
@@ -25,12 +24,18 @@ public class WaterPortabilityEventProducer {
     KafkaTemplate<Integer, WaterPortability> kafkaTemplate;
 
     @Autowired
-    FetchDataFromSource fetchDataFromSource;
+    DataFetcher dataFetcher;
 
     private final String topic = "water-portability-events";
 
+    public WaterPortabilityEventProducer(KafkaTemplate<Integer, WaterPortability> kafkaTemplate,
+                                         DataFetcher dataFetcher) {
+        this.kafkaTemplate = kafkaTemplate;
+        this.dataFetcher = dataFetcher;
+    }
+
     //ToDo: send event in json format.
-    public ListenableFuture<SendResult<Integer, WaterPortability>>
+    public void
     sendJson(WaterPortability waterPortability,
              int id) {
 
@@ -39,29 +44,26 @@ public class WaterPortabilityEventProducer {
 
         ProducerRecord<Integer,WaterPortability> producerRecordJson = buildProducerRecordJson(key, value);
 
-        ListenableFuture<SendResult<Integer, WaterPortability>> listenableFuture =
-                kafkaTemplate.send(producerRecordJson);
-        return listenableFuture;
+        kafkaTemplate.send(producerRecordJson)
+                .addCallback(new ListenableFutureCallback<>() {
+            @Override
+            public void onFailure(Throwable ex) {
+                handleFailure(key, value, ex);
+            }
+
+            @Override
+            public void onSuccess(SendResult<Integer, WaterPortability> result) {
+                handleSuccess(key, value, result);
+            }
+        });
     }
 
-//    @EventListener(ApplicationReadyEvent.class)
-    public void producer() {
-        List<WaterPortability> data = fetchDataFromSource.fetchData();
+    @EventListener(ApplicationReadyEvent.class)
+    public void produce() {
+        List<WaterPortability> data = dataFetcher.fetchData();
         for(int i=0; i<data.size();i++){
-            int key = i;
             WaterPortability value = data.get(i);
-            sendJson(value,key)
-            .addCallback(new ListenableFutureCallback<>() {
-                @Override
-                public void onFailure(Throwable ex) {
-                    handleFailure(key, value, ex);
-                }
-
-                @Override
-                public void onSuccess(SendResult<Integer, WaterPortability> result) {
-                    handleSuccess(key, value, result);
-                }
-            });
+            sendJson(value,i);
             delay(10000);
         }
     }

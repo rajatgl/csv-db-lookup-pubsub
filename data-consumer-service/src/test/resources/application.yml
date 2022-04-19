@@ -1,17 +1,38 @@
+#spring:
+#  cloud:
+#    stream:
+#      bindings:
+#        process-in-0:
+#          destination: input-topic
+#        process-out-0:
+#          destination: output-topic
+#      kafka:
+#        streams:
+#          binder:
+#            brokers:  ${spring.embedded.kafka.brokers}
+#            configuration:
+#              commit.interval.ms: 100
+#              default:
+#                key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+#                value.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
 spring:
-  cloud:
-    stream:
-      bindings:
-        process-in-0:
-          destination: input-topic
-        process-out-0:
-          destination: output-topic
-      kafka:
-        streams:
-          binder:
-            brokers:  ${spring.embedded.kafka.brokers}
-            configuration:
-              commit.interval.ms: 100
-              default:
-                key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
-                value.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+  kafka:
+    consumer:
+      bootstrap-servers: ${spring.embedded.kafka.brokers}
+      key-deserializer: org.apache.kafka.common.serialization.IntegerDeserializer
+      value-deserializer: com.headstrait.dataconsumer.deserializer.CustomDeserializer
+      group-id: water-portability-event-listener-group
+      properties:
+        spring:
+          json:
+            trusted:
+              packages: "com.headstrait.dataconsumer.deserializer.CustomDeserializer"
+
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    generate-ddl: true
+    hibernate:
+      ddl-auto: 'create-drop'

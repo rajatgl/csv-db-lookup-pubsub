@@ -23,6 +23,5 @@ public class WaterPortabilityEventConsumer {
         waterPotabilityEventService.processJsonConsumerEvent(consumerRecord);
         this.consumerRecord = consumerRecord;
         log.info("ConsumerRecord-C1 : {} ", consumerRecord );
-
     }
 }

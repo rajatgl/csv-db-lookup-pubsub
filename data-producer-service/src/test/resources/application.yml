@@ -7,7 +7,7 @@ server:
 spring:
   kafka:
     producer:
-      bootstrap-servers: localhost:19092,localhost:29092,localhost:39092
+      bootstrap-servers:  ${spring.embedded.kafka.brokers}
       key-serializer: org.apache.kafka.common.serialization.IntegerSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       properties:
@@ -20,3 +20,5 @@ spring:
   config:
     activate:
       on-profile: test
+#kafka:
+#  bootstrap-servers: ${spring.embedded.kafka.brokers}
