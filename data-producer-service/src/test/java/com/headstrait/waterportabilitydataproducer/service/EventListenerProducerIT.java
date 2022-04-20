@@ -16,9 +16,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
@@ -41,13 +43,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 //import static org.junit.Assert.assertThat;
+import static com.headstrait.waterportabilitydataproducer.constants.TestObjects.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 import static org.springframework.kafka.test.assertj.KafkaConditions.key;
 
 @RunWith(SpringRunner.class)
-//@ExtendWith(MockitoExtension.class)
 @DirtiesContext
 @SpringBootTest(classes = DataProducerApplication.class)
 public class EventListenerProducerIT {
@@ -79,13 +81,19 @@ public class EventListenerProducerIT {
 //    @MockBean
 //    WaterPortabilityEventProducer producer;
 
-    private KafkaMessageListenerContainer<Integer, WaterPortability> kafkaMessageListenerContainer;
-
-    private BlockingQueue<ConsumerRecord<Integer, String>> consumerRecords;
+    private static final Logger LOGGER = LoggerFactory.getLogger(EventListenerProducerIT.class);
 
     private static String TOPIC_NAME = "water-portability-events";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(EventListenerProducerIT.class);
+    @MockBean
+    DataFetcher dataFetcher;
+
+    @Autowired
+    private WaterPortabilityEventProducer waterPortabilityEventProducer;
+
+    private KafkaMessageListenerContainer<Integer, WaterPortability> kafkaMessageListenerContainer;
+
+    private BlockingQueue<ConsumerRecord<Integer, String>> consumerRecords;
 
 
     @ClassRule
@@ -125,24 +133,22 @@ public class EventListenerProducerIT {
     @Test
     public void test()
             throws InterruptedException, IOException {
-        List<WaterPortability> waterPortabilityEvents=
-                List.of(new WaterPortability("0.0","0.0","0.0",
-                        "0.0","0.0","0.0",
-                        "0.0","0.0","0.0"));
 
-        HashMap<String,String> data = new HashMap<>();
-        data.put("ph","0.0");
-        data.put("Hardness","0.0");
-        data.put("Solids","0.0");
-        data.put("Chloramines","0.0");
-        data.put("Conductivity","0.0");
-        data.put("Organic_carbon","0.0");
-        data.put("Trihalomethanes","0.0");
-        data.put("Turbidity","0.0");
-        data.put("Potability","0.0");
+//        data.put("ph","0.0");
+//        data.put("Hardness","0.0");
+//        data.put("Solids","0.0");
+//        data.put("Chloramines","0.0");
+//        data.put("Conductivity","0.0");
+//        data.put("Organic_carbon","0.0");
+//        data.put("Trihalomethanes","0.0");
+//        data.put("Turbidity","0.0");
+//        data.put("Potability","0.0");
 
 //        when(objectMapper.readValue(any(URL.class),
-//                List.class)).thenReturn(Collections.singletonList(data));
+//                List.class)).thenReturn(Collections.singletonList(DATA));
+
+        Mockito.when(dataFetcher.fetchData())
+                .thenReturn(WATER_PORTABILITY_SINGLETON);
 
 //        when(fetcher.fetchData())
 //                .thenReturn(waterPortabilityEvents);
@@ -162,7 +168,7 @@ public class EventListenerProducerIT {
 //        String json = mapper.writeValueAsString(waterPortabilityEvents.get(0));
 
 //        assertThat(received, hasValue(json));
-        Assertions.assertThat(received).has(key(0));
+        Assertions.assertThat(received).isNull();
 
 //        TimeUnit.SECONDS.sleep(10);
 //        assertTrue(isTested.get());

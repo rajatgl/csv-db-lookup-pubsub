@@ -36,7 +36,7 @@ import java.util.concurrent.TimeUnit;
 import static com.headstrait.waterportabilitydataproducer.constants.TestObjects.WATER_PORTABILITY_EVENT;
 import static com.headstrait.waterportabilitydataproducer.constants.TestObjects.WATER_PORTABILITY_EVENTS;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.springframework.kafka.test.assertj.KafkaConditions.key;
 import static org.springframework.kafka.test.hamcrest.KafkaMatchers.hasValue;
 

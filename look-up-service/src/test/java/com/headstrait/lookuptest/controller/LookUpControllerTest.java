@@ -45,8 +45,15 @@ public class LookUpControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/fetch"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.[0].id", is(1)))
-                .andExpect(jsonPath("$.[0].ph", is(0.0)))
-                .andExpect(jsonPath("$.[0].hardness", is(0.0)));
+                .andExpect(jsonPath("$.[0].ph", is(1.0)))
+                .andExpect(jsonPath("$.[0].hardness", is(1.0)))
+                .andExpect(jsonPath("$.[0].solids", is(1.0)))
+                .andExpect(jsonPath("$.[0].chloramines", is(1.0)))
+                .andExpect(jsonPath("$.[0].conductivity", is(1.0)))
+                .andExpect(jsonPath("$.[0].organic_carbon", is(1.0)))
+                .andExpect(jsonPath("$.[0].trihalomethanes", is(1.0)))
+                .andExpect(jsonPath("$.[0].turbidity", is(1.0)))
+                .andExpect(jsonPath("$.[0].potability", is(1.0)));
     }
 
 
@@ -59,8 +66,15 @@ public class LookUpControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/fetch/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(1)))
-                .andExpect(jsonPath("$.ph", is(0.0)))
-                .andExpect(jsonPath("$.hardness", is(0.0)));
+                .andExpect(jsonPath("$.ph", is(1.0)))
+                .andExpect(jsonPath("$.hardness", is(1.0)))
+                .andExpect(jsonPath("$.solids", is(1.0)))
+                .andExpect(jsonPath("$.chloramines", is(1.0)))
+                .andExpect(jsonPath("$.conductivity", is(1.0)))
+                .andExpect(jsonPath("$.organic_carbon", is(1.0)))
+                .andExpect(jsonPath("$.trihalomethanes", is(1.0)))
+                .andExpect(jsonPath("$.turbidity", is(1.0)))
+                .andExpect(jsonPath("$.potability", is(1.0)));
     }
 
 }

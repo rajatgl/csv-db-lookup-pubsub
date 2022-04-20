@@ -1,6 +1,7 @@
 package com.headstrait.dataconsumer.intg;
 
 import com.headstrait.dataconsumer.entity.WaterPortabilityModel;
+import com.headstrait.dataconsumer.model.WaterPortability;
 import com.headstrait.dataconsumer.repository.WaterPortabilityRepository;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
@@ -29,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @DirtiesContext
-@EmbeddedKafka(topics = {"water-portability-events"})
+@EmbeddedKafka(topics = {"water-portability-events","test-topic"})
 public class WaterPotabilityIntegrationTest {
     Logger log = LoggerFactory.getLogger(WaterPotabilityIntegrationTest.class);
 
@@ -41,9 +42,10 @@ public class WaterPotabilityIntegrationTest {
     @Autowired
     private WaterPortabilityRepository waterPortabilityRepository;
 
-    public WaterPortabilityModel mockWaterPotabilityData() {
-        return new WaterPortabilityModel(0.0,0.0,0.0,
-                0.0,0.0,0.0,0.0,0.0,0.0);
+    public WaterPortability mockWaterPotabilityData() {
+        return new WaterPortability(0.0f,0.0f,0.0f,
+                0.0f,0.0f,0.0f,
+                0.0f,0.0f,0.0f);
     }
 
     /**
@@ -53,14 +55,15 @@ public class WaterPotabilityIntegrationTest {
     public void itShould_ConsumeCorrectWaterPotabilityEvent_from_TOPIC_EXAMPLE_and_should_saveTheEntity()
             throws ExecutionException, InterruptedException {
         // GIVEN
-        WaterPortabilityModel waterPortabilityModel = mockWaterPotabilityData();
+        WaterPortability waterPotabilityData = mockWaterPotabilityData();
         // SIMULATE PRODUCER
         Map<String, Object> producerProps = KafkaTestUtils
                 .producerProps(embeddedKafkaBroker.getBrokersAsString());
+
         log.info("props {}", producerProps);
         Producer<Integer, WaterPortabilityModel> producerTest = new KafkaProducer(producerProps,
                 new IntegerSerializer(),
-                new JsonSerializer<WaterPortabilityModel>());
+                new JsonSerializer<WaterPortability>());
         // OR
         // ProducerFactory producerFactory = new DefaultKafkaProducerFactory<String, ExampleDTO>(producerProps, new StringSerializer(), new JsonSerializer<ExampleDTO>());
         // Producer<String, ExampleDTO> producerTest = producerFactory.createProducer();
@@ -71,13 +74,13 @@ public class WaterPotabilityIntegrationTest {
         // template.send(producerRecord);
         // WHEN
         producerTest.send(new ProducerRecord(TOPIC_EXAMPLE,
-                0, waterPortabilityModel));
+                0, waterPotabilityData));
         // THEN
         await().atMost(Durations.TEN_SECONDS).untilAsserted(() -> {
             var waterPotabilityEntityList = waterPortabilityRepository.findAll();
             assertEquals(1, waterPotabilityEntityList.size());
             WaterPortabilityModel firstEntity = waterPotabilityEntityList.get(0);
-            assertEquals(waterPortabilityModel.getPh(), firstEntity.getPh());
+            assertEquals(waterPotabilityData.getPh(), firstEntity.getPh());
         });
         //teardown
         producerTest.close();
